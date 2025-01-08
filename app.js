@@ -1,10 +1,26 @@
+// Init
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 
-// immagini statiche
-// accettare json
-// usare i cors
+// Middlewares
+const cors = require('cors')
+const errorsHandler = require('./middlewares/errorsHandler.js')
+const notFound = require('./middlewares/notFound.js')
+
+// Routers
+
+
+
+// uso i Cors solo su indirizzo in locale
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+}))
+// Rendo statica la cartella public che contiene le immagini
+app.use(express.static('public'))
+// Body parser per accettare la request in Json
+app.use(express.json())
+
 
 // Rotta principale del server
 app.get('/', (_, res) => {
@@ -15,7 +31,9 @@ app.get('/', (_, res) => {
 // Rotte delle risorse
 
 // Middleware errori generici/non gestiti prima 
+app.use(errorsHandler)
 // Middleware errore 404 per risorsa non trovata
+app.use(notFound)
 
 // Porta del server
 app.listen(port, () => {
