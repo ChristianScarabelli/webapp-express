@@ -4,14 +4,34 @@ const connection = require('../data/db.js')
 // Elenco dei movies
 function index(_, res) {
 
-    // query
-    let sql = `SELECT * FROM movies`
+    // query per selezionare tutti i movies ordinati per voto medio e raggruppati per id
+    let sql = `SELECT movies.* , AVG(vote) AS avg_vote
+                FROM movies
+                JOIN reviews
+                ON movies.id = reviews.movie_id`
+
+    // concateno query per filtro di ricerca
+    if (req.query.search) {
+        sql += `WHERE title LIKE '%${req.query.search}%' 
+                OR director LIKE '%${req.query.search}% 
+                OR genre LIKE '%${req.query.search}% 
+                OR abstract LIKE '%${req.query.search}%`
+    }
+
+    // termino la query concatenando/raggruppando per id dopo il where
+    sql += `GROUP BY movies.id`
 
     connection.query(sql, (err, results) => {
         if (err) return res.status(500).json({ message: err.message })
-        res.json(results)
+
+        // definisco l'url immagini dal database così arriva già completo
+        movies.forEach(movie => {
+            movie.image = `${process.env.BE_HOST}/public/movies_cover/${movie.image}`
+        })
+        res.json(movies)
     })
 }
+
 
 // Dettagli di un movie e le sue recensioni
 function show(req, res) {
@@ -27,7 +47,13 @@ function show(req, res) {
     }
 
     // query per il dettaglio con prepared statements
-    const sql = `SELECT * FROM movies WHERE id = ?`
+    // con voto medio 
+    let sql = `SELECT movies.* , AVG(vote) AS avg_vote
+                FROM movies
+                JOIN reviews
+                ON movies.id = reviews.movie_id
+                WHERE id = ?
+                GROUP BY movies.id`
 
     connection.query(sql, [id], (err, result) => {
         if (err) return res.status(500).json({ message: err.message })
