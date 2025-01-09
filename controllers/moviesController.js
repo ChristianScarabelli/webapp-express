@@ -2,7 +2,7 @@
 const connection = require('../data/db.js')
 
 // Elenco dei movies
-function index(_, res) {
+function index(req, res) {
 
     // query per selezionare tutti i movies ordinati per voto medio e raggruppati per id
     let sql = `SELECT movies.* , AVG(vote) AS avg_vote
@@ -12,23 +12,23 @@ function index(_, res) {
 
     // concateno query per filtro di ricerca
     if (req.query.search) {
-        sql += `WHERE title LIKE '%${req.query.search}%' 
+        sql += ` WHERE title LIKE '%${req.query.search}%' 
                 OR director LIKE '%${req.query.search}% 
                 OR genre LIKE '%${req.query.search}% 
                 OR abstract LIKE '%${req.query.search}%`
     }
 
     // termino la query concatenando/raggruppando per id dopo il where
-    sql += `GROUP BY movies.id`
+    sql += ` GROUP BY movies.id`
 
     connection.query(sql, (err, results) => {
         if (err) return res.status(500).json({ message: err.message })
 
         // definisco l'url immagini dal database così arriva già completo
-        movies.forEach(movie => {
+        results.forEach(movie => {
             movie.image = `${process.env.BE_HOST}/public/movies_cover/${movie.image}`
         })
-        res.json(movies)
+        res.json(results)
     })
 }
 
@@ -52,7 +52,7 @@ function show(req, res) {
                 FROM movies
                 JOIN reviews
                 ON movies.id = reviews.movie_id
-                WHERE id = ?
+                WHERE movies.id = ?
                 GROUP BY movies.id`
 
     connection.query(sql, [id], (err, result) => {
