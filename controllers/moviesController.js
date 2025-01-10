@@ -66,6 +66,9 @@ function show(req, res) {
         // variabile nomeRisorsa con il primo risultato dell'array
         const movie = result[0]
 
+        // definisco l'url dal databse per la singola immagine
+        movie.image = `${process.env.BE_HOST}/movies_cover/${movie.image}`
+
         // query annidata per le recensioni di un movie
         const sql = `SELECT * FROM reviews WHERE movie_id = ?`
 
