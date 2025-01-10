@@ -4,7 +4,7 @@ const connection = require('../data/db.js')
 // Elenco dei movies
 function index(req, res) {
 
-    // query per selezionare tutti i movies ordinati per voto medio e raggruppati per id
+    // query per selezionare tutti i movies, con calcolo per voto medio e raggruppati per id
     let sql = `SELECT movies.* , AVG(vote) AS avg_vote
                 FROM movies
                 JOIN reviews
@@ -13,9 +13,9 @@ function index(req, res) {
     // concateno query per filtro di ricerca
     if (req.query.search) {
         sql += ` WHERE title LIKE '%${req.query.search}%' 
-                OR director LIKE '%${req.query.search}% 
-                OR genre LIKE '%${req.query.search}% 
-                OR abstract LIKE '%${req.query.search}%`
+                OR director LIKE '%${req.query.search}%' 
+                OR genre LIKE '%${req.query.search}%' 
+                OR abstract LIKE '%${req.query.search}%'`
     }
 
     // termino la query concatenando/raggruppando per id dopo il where
@@ -25,8 +25,9 @@ function index(req, res) {
         if (err) return res.status(500).json({ message: err.message })
 
         // definisco l'url immagini dal database così arriva già completo
+        // non serve includere la cartella public nel percorso perchè è servita come directory base!!!
         results.forEach(movie => {
-            movie.image = `${process.env.BE_HOST}/public/movies_cover/${movie.image}`
+            movie.image = `${process.env.BE_HOST}/movies_cover/${movie.image}`
         })
         res.json(results)
     })
@@ -47,7 +48,7 @@ function show(req, res) {
     }
 
     // query per il dettaglio con prepared statements
-    // con voto medio 
+    // con calcolo per voto medio 
     let sql = `SELECT movies.* , AVG(vote) AS avg_vote
                 FROM movies
                 JOIN reviews
