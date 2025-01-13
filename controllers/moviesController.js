@@ -84,4 +84,29 @@ function show(req, res) {
     })
 }
 
-module.exports = { index, show }
+// aggiungere una nuova review
+function storeReview(req, res) {
+
+    console.log(req.body)
+
+    // prendo l'id (del movie) dal path 
+    const id = req.params.id
+
+    // recupero i parametri dalla body request inviata dal form
+    const { name, text, vote } = req.body
+
+    // query
+    const sql = `INSERT INTO reviews (name, vote, text, movie_id) 
+                VALUES (?, ?, ?, ?)`
+
+    // fare validazioni in base al tipo di dato del database
+
+    // eseguo la query con esito positivo senza risultati (201)
+    // al posto di movie_id si usa l'id recuperato dal path (req.params)
+    connection.query(sql, [name, vote, text, id], (err, results) => {
+        if (err) return res.status(500).json({ message: err.message })
+        res.status(201).json({ message: 'Review added to DB' })
+    })
+}
+
+module.exports = { index, show, storeReview }

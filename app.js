@@ -14,10 +14,10 @@ const moviesRouter = require('./routers/moviesRouter.js')
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
 }))
-// Rendo statica la cartella public che contiene le immagini
-app.use(express.static('public'))
 // Body parser per accettare la request in Json
 app.use(express.json())
+// Rendo statica la cartella public che contiene le immagini
+app.use(express.static('public'))
 
 // Rotta principale del server
 app.get('/', (_, res) => {
