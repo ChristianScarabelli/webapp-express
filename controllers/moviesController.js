@@ -95,11 +95,29 @@ function storeReview(req, res) {
     // recupero i parametri dalla body request inviata dal form
     const { name, text, vote } = req.body
 
+    // VALIDAZIONI (in base al tipo di dato del database)
+
+    // converto vote in un numero
+    const intVote = parseInt(vote)
+
+    let errors = []
+
+    if (!name || typeof name !== 'string' || name.length > 255) {
+        errors.push('Name is required')
+    }
+
+    if (!intVote || isNaN(intVote) || intVote < 1 || intVote > 5) {
+        errors.push('Vote is required and must be a number between 1 and 5')
+    }
+
+    // Se ci sono errori, restituisco il json con gli errori e codice di richiesta dall'utente errata
+    if (errors.length) {
+        res.status(400).json({ errors })
+    }
+
     // query
     const sql = `INSERT INTO reviews (name, vote, text, movie_id) 
                 VALUES (?, ?, ?, ?)`
-
-    // fare validazioni in base al tipo di dato del database
 
     // eseguo la query con esito positivo senza risultati (201)
     // al posto di movie_id si usa l'id recuperato dal path (req.params)

@@ -6,8 +6,10 @@ const port = process.env.PORT || 3000
 const cors = require('cors')
 const errorsHandler = require('./middlewares/errorsHandler.js')
 const notFound = require('./middlewares/notFound.js')
+const trimStrings = require('./middlewares/trimString.js')
 // Routers
 const moviesRouter = require('./routers/moviesRouter.js')
+
 
 
 // uso i Cors solo su indirizzo in locale
@@ -16,6 +18,8 @@ app.use(cors({
 }))
 // Body parser per accettare la request in Json
 app.use(express.json())
+// trim string middleware
+app.use(trimStrings)
 // Rendo statica la cartella public che contiene le immagini
 app.use(express.static('public'))
 
